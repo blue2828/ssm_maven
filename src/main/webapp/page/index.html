@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="shortcut icon" href="../images/stephy.ico" />
+    <script src="../common/jquery.min.js"></script>
+    <script>
+        $(function(){
+            $("#sbm_btn").click(function(){
+                $.ajax({
+                    url:'../validateUser',
+                    async:true,
+                    dataType:'json',
+                    contentType:'text/json',
+                    data:$('form').serialize(),
+                    method:'post',
+                    success:function(result){
+                        alert(result.msg);
+                    }
+                }) ;
+            });
+        });
+
+    </script>
+</head>
+<body>
+    <form method="post" enctype="multipart/form-data" action="../uploadFile">
+        <input type="file" name="hh">
+        <input type="submit" value="tijiao">
+    </form>
+</body>
+</html>
