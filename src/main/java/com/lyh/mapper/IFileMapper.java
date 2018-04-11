@@ -10,6 +10,6 @@ import java.util.List;
 public interface IFileMapper {
     @Select("select * from t_file")
     public List<File> listFiles();
-    @Insert("insert into t_file values(null,#{file.fileName},#{file.fileDesc},#{file.realName}")
+    @Insert("insert into t_file values (null,#{file.fileName},#{file.fileDesc},#{file.realName})")
     public int insertFileInfo(@Param("file") File file);
 }

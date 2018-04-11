@@ -19,15 +19,6 @@ import java.util.UUID;
 @Controller("fileController")
 @Scope("prototype")
 public class FileController {
-    private static final long serialVersionUID = 1L;
-
-    // 上传文件存储目录
-    private static final String UPLOAD_DIRECTORY = "upload";
-
-    // 上传配置
-    private static final int MEMORY_THRESHOLD   = 1024 * 1024 * 3;  // 3MB
-    private static final int MAX_FILE_SIZE      = 1024 * 1024 * 40; // 40MB
-    private static final int MAX_REQUEST_SIZE   = 1024 * 1024 * 50; // 50MB
     private JSONObject jb=null;
     public JSONObject getJb() {
         return jb;
@@ -51,15 +42,15 @@ public class FileController {
     }
     @RequestMapping("/uploadFile")
     @ResponseBody
-    public JSONObject uploadFile(@RequestParam(value="hh",required = false) MultipartFile uploadFile)throws Exception{
+    public JSONObject uploadFile(@RequestParam(value="file",required = false) MultipartFile uploadFile)throws Exception{
         jb=new JSONObject();
-        String directory="D:/fileplUoad";
+        String directory="D:/fileUpload";
         if(uploadFile.getSize()<=0){
             System.out.println("上传错误，请检查当前是否有文件被选中上传");
             jb.put("code",0);
         }else{
             String originalFileName=uploadFile.getOriginalFilename();
-            String fullName=directory+mkFullFileName(originalFileName);
+            String fullName=directory+java.io.File.separator+mkFullFileName(originalFileName);
             File file=new File(fullName,"待定",originalFileName);
             int num=fileService.insertFileInfo(file);
             if(num>0){
