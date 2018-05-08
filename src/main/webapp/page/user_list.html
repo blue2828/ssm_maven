@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="../images/stephy.ico"/>
+    <link rel="stylesheet" href="../common/layui/css/layui.css">
+    <script type="text/javascript" src="../common/layui/layui.js"></script>
+    <title>用户界面</title>
+</head>
+<body>
+    <div style="margin:5px 0 0 5px;" class="layui-inline">
+        <button id="add_btn" type="button" class="layui-btn layui-btn-normal"><i class="layui-icon">&#xe61f;</i><span>添加</span></button>
+        <input  placeholder="根据名字搜" style="width:200px;height:34px;border:1px solid #D2D2D2;">
+        <button type="button" class="layui-btn"><i class="layui-icon">&#xe615;</i><span>搜索</span></button>
+    </div>
+    <table  id="lay_tb" lay-filter="tab_filter"></table>
+    <div id="btn_op" style="display:none;">
+        <button class="layui-btn layui-btn-normal layui-btn-mini"  lay-event="remove" ><i class="layui-icon">&#xe640;</i><span>删除</span></button>
+        <button class="layui-btn layui-btn-mini" lay-event="edit" ><i class="layui-icon" >&#xe642;</i><span>修改</span></button>
+    </div>
+    <div id="frame" style="display:none;">
+        <form method="post" id="fm" class="layui-form layui-form-pane">
+            <div id="pwd_input" class="layui-form-item">
+                <label class="layui-form-label">密码</label>
+                <div class="layui-input-inline">
+                    <input class="layui-input" type="password" autocomplete="off" placeholder="请输入密码" name="password" lay-verify="required">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">邮箱</label>
+                <div class="layui-input-inline">
+                    <input class="layui-input" autocomplete="off" lay-verify="email" placeholder="请输入邮箱" name="email" >
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">姓名</label>
+                <div class="layui-input-inline">
+                    <input class="layui-input" autocomplete="off" placeholder="请输入账号" name="userName" lay-verify="required">
+                </div>
+            </div>
+            <button id="submit_btn" style="display:none;" type="button" class="layui-btn layui-btn-normal" style="margin-left:40%;" lay-filter="submit_filter" lay-submit>提交</button>
+        </form>
+    </div>
+    <script>
+        layui.use(['table','layer','jquery','form'],function(){
+            var table=layui.table,layer=layui.layer,$=layui.jquery,form=layui.form;
+            var tbOp=table.render({
+                url:'../getAllUser',
+                page:true,
+                elem:'#lay_tb',
+                height:400,
+                cols:[[
+                    {field:'cb',checkbox:true},
+                    {field:'id',title:'编号',width:100,sort:true,align:'center'},
+                    {field:'userName',title:'姓名',width:200,align:'center'},
+                    {field:'email',title:'邮箱',width:300,align:'center'},
+                    {field:'op',title:'操作',width:180,align:'center',toolbar:'#btn_op'}
+                ]]
+            });
+            var openFrame=function(opFlag){
+                var title='';
+                opFlag==1?title='编辑信息':title='添加信息';
+                var domOb=$('#fm').children();
+                if(domOb.length>4){
+                    $('#id_input').remove();
+                }
+                    if(title=='编辑信息'){
+                        $('#pwd_input').before("<div id=\"id_input\" class=\"layui-form-item\">\n" +
+                            "                <label class=\"layui-form-label\">编号</label>\n" +
+                            "                <div class=\"layui-input-inline\">\n" +
+                            "                    <input class=\"layui-input\" type=\"text\" name='id'  readonly='readonly'  >\n" +
+                            "                </div>\n" +
+                            "            </div>");
+                    }
+
+
+                var frameIndex=layer.open({
+                    title:title,
+                    type:1,
+                    content:$('#frame'),
+                    area:['360px','300px'],
+                    btn:['保存','取消'],
+                    yes:function(index,layero){
+                        var version='';
+                        opFlag==1?version=1:version=0;
+                        $('#submit_btn').click();
+                        form.on('submit(submit_filter)',function(data){
+                            $.ajax({
+                                url:'../saveUser?version='+version,
+                                dataType:'json',
+                                async:true,
+                                data:data.field,
+                                contentType:'application/json',
+                                success:function(result){
+                                    if(result.success){
+                                        layer.msg("保存成功！",{icon:6,time:800});
+                                        tbOp.reload({
+                                           url:'../getAllUser'
+                                        });
+                                        layer.close(frameIndex);
+                                    }else{
+                                        layer.msg("保存失败",{icon:5,time:1000});
+                                    }
+                                }
+                            });
+                        });
+                    },
+                    end:function(){
+                        layer.close(frameIndex);
+                    }
+                });
+            };
+            table.on('tool(tab_filter)',function(obj){
+                var data=obj.data;
+                var event=obj.event;
+                if(event == 'remove'){
+                    layer.confirm("确定要删除吗？",function(index){
+                        $.post('../delUser',{'del_id':data.id},function(result){
+                            if(result.success) {
+                                layer.msg('删除成功',{icon:6,time:1000});
+                                tbOp.reload({
+                                    url:'../getAllUser'
+                                });
+                            }else layer.msg("删除失败",{icon:5,time:1000});
+                            layer.close(index);
+                        },'json');
+                    });
+                }else if(event == "edit"){
+                    openFrame(1);
+                    $('#id_input').find("input:eq(0)").attr("value",""+data.id+"");
+                    $("input[name='userName']").val(data.userName);
+                    $("input[name='email']").val(data.email);
+                    $("input[name='password']").attr('placeholder','请输入需要修改的密码');
+                }
+            });
+            $('#add_btn').on("click",function(){
+                $("input[name='password']").attr('placeholder','请输入密码');
+                $("input[name='password']").val('');
+                $("input[name='userName']").val('');
+                $("input[name='email']").val('');
+                openFrame(0);
+            });
+        });
+    </script>
+</body>
+</html>
