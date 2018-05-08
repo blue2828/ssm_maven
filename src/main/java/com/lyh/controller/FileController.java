@@ -4,7 +4,12 @@ import com.lyh.entity.File;
 import com.lyh.service.IFileService;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.apache.commons.io.FileUtils;
 import org.springframework.context.annotation.Scope;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -32,7 +37,7 @@ public class FileController {
     @RequestMapping("/getFileInfo")
     public JSONObject listFiles(){
         jb=new JSONObject();
-        List<File> list=fileService.listFiles();
+        List<File> list=fileService.listFiles(-1);
         JSONArray array=list==null?null:JSONArray.fromObject(list);
         jb.put("data",array);
         jb.put("code",0);
@@ -72,5 +77,21 @@ public class FileController {
     }
     public String mkFullFileName(String originalFileName){
         return UUID.randomUUID().toString().replaceAll("-","_")+"_"+originalFileName.replaceAll("-","_");
+    }
+
+    @RequestMapping("/downloadFile")
+    public ResponseEntity<byte[]> downLoadFile(int id){
+        List<File> list=fileService.listFiles(id);
+        File file=list.get(0);
+        ResponseEntity<byte[]> responseEntity=null;
+        try{
+            HttpHeaders headers=new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.setContentDispositionFormData("attachment",file.getRealName());
+            responseEntity=new ResponseEntity<byte[]>(FileUtils.readFileToByteArray(new java.io.File(file.getFileName())),headers, HttpStatus.CREATED);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return responseEntity;
     }
 }

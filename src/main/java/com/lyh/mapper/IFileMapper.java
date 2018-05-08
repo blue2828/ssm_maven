@@ -8,8 +8,9 @@ import org.apache.ibatis.annotations.Select;
 import java.util.List;
 
 public interface IFileMapper {
-    @Select("select * from t_file")
-    public List<File> listFiles();
+    @Select("<script>select <if test=\"id>-1\"> fileName,realName </if> <if test=\"id==-1\">*</if> from t_file <if test=\"id>-1\">" +
+            " where id =#{id}</if></script>")
+    public List<File> listFiles(@Param("id") int id);
     @Insert("insert into t_file values (null,#{file.fileName},#{file.fileDesc},#{file.realName})")
     public int insertFileInfo(@Param("file") File file);
 }

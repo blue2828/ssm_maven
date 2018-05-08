@@ -13,10 +13,10 @@ public class FileService implements IFileService {
     @Resource
     private IFileDao fileDao;
     @Override
-    public List<File> listFiles() {
+    public List<File> listFiles(int id) {
         List<File> list=null;
         try{
-            list=fileDao.listFiles();
+            list=fileDao.listFiles(id);
         }catch (Exception e){
             e.printStackTrace();
         }

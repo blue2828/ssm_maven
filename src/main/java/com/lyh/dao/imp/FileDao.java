@@ -12,10 +12,10 @@ import java.util.List;
 @Repository("fileDao")
 public class FileDao extends BaseDao implements IFileDao {
     @Override
-    public List<File> listFiles() {
+    public List<File> listFiles(int id) {
         SqlSession session=getSqlSession();
         IFileMapper fileMapper=session.getMapper(IFileMapper.class);
-        List<File> list=fileMapper.listFiles();
+        List<File> list=fileMapper.listFiles(id);
         return list;
     }
 

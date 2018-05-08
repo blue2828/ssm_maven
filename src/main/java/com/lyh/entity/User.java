@@ -4,9 +4,13 @@ public class User {
     private int id;
     private String userName;
     private String password;
-    private String imageHeader;
+    private String email;
+
+    public User() {
+    }
 
     public int getId() {
+
         return id;
     }
 
@@ -30,15 +34,18 @@ public class User {
         this.password = password;
     }
 
-    public String getImageHeader() {
-        return imageHeader;
+    public String getEmail() {
+        return email;
     }
 
-    public void setImageHeader(String imageHeader) {
-        this.imageHeader = imageHeader;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
-    public User() {
+    public User(int id, String userName, String password, String email) {
+        this.id = id;
+        this.userName = userName;
+        this.password = password;
+        this.email = email;
     }
-
 }
