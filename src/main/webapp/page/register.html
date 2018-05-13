@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="shortcut icon" href="../images/stephy.ico" />
+    <script src="../common/layui/layui.js" media="all"></script>
+    <link rel="stylesheet" href="../common/layui/css/layui.css">
+    <script>
+        layui.use(['form','layer','table','jquery'],function(){
+            var form=layui.form,layer=layui.layer,table=layui.table,$=layui.jquery;
+            form.on('submit(submit_filter)',function(data){
+                $.ajax({
+                    url:'../registerUser',
+                    contentType:'application/html',
+                    dataType:'json',
+                    data:data.field,
+                    async:true,
+                    success:function(result){
+                        if(result.success){
+                            layer.alert('注册成功，系统将以结果以邮件的形式发送给您！',{icon:6,skin:'layui-layer-lan',title:'系统提示'});
+                        }else{
+                            layer.alert(result.errMsg,{icon:5,skin:'layui-layer-lan',title:'系统提示'});
+                        }
+                    },
+                    error:function(){
+                        layer.alert("连接服务器出错，请检查网络",{icon:5,skin:'layui-layer-lan',title:'系统提示'});
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+<div style="width:400px;height:280px;background-color:#6FC1DE;margin:10% 0 0 36%;padding-top:5%;">
+    <form id="fm" class="layui-form layui-form-pane" method="post">
+        <div class="layui-form-item">
+            <label class="layui-form-label">账号</label>
+            <div class="layui-input-block">
+                <input class="layui-input" name="userName" placeholder="输入姓名" autocomplete="off" lay-verify="required">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">密码</label>
+            <div class="layui-input-block">
+                <input class="layui-input" type="password" name="password" placeholder="输入密码" autocomplete="off" lay-verify="required">
+            </div>
+        </div><div class="layui-form-item">
+            <label class="layui-form-label">邮箱</label>
+            <div class="layui-input-block">
+                <input class="layui-input" type="text" name="email" placeholder="输入邮箱" autocomplete="off" lay-verify="required|email">
+            </div>
+        </div>
+        <button style="margin:30px 0 0 36%;" type="button" lay-filter="submit_filter" lay-submit class="layui-btn layui-btn-normal"><i class="layui-icon">&#xe609;</i><span>登录</span></button>
+    </form>
+</div>
+</body>
+</html>

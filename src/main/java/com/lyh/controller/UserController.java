@@ -1,10 +1,14 @@
 package com.lyh.controller;
 
+import com.lyh.activemq.producer.TopicProducer;
 import com.lyh.entity.PageBean;
 import com.lyh.entity.User;
+import com.lyh.service.IMailService;
 import com.lyh.service.IUserService;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,7 +22,12 @@ import java.util.List;
 @Scope("prototype")
 public class UserController {
     @Resource
+    private TopicProducer topicProducer;
+    @Resource
     private IUserService userService;
+    @Autowired
+    @Qualifier("mailService")
+    private IMailService mailService;
     @RequestMapping("/getAllUser")
     @ResponseBody
     public JSONObject getAllUser(int page,int limit){
@@ -57,6 +66,22 @@ public class UserController {
         }
         if(flag>0) jb.put("success",true);
         else jb.put("success",false);
+        return jb;
+    }
+    @RequestMapping("/registerUser")
+    @ResponseBody
+    public JSONObject registerUser(User user){
+        JSONObject jb=new JSONObject();
+        int num=userService.insertUser(user);
+        if(num>0) {
+            jb.put("success",true);
+            topicProducer.send("springTopic","恭喜您成功注册");
+            mailService.send(user.getEmail(),"注册结果","恭喜您成功注册系统");
+        }
+        else {
+            jb.put("success",false);
+            jb.put("errMsg","注册失败！");
+        }
         return jb;
     }
 }

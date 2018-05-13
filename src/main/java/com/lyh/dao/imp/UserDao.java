@@ -52,4 +52,5 @@ public class UserDao extends BaseDao implements IUserDao {
         return num;
     }
 
+
 }

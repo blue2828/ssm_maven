@@ -5,14 +5,22 @@
        xmlns:aop="http://www.springframework.org/schema/aop"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:jee="http://www.springframework.org/schema/jee"
+       xmlns:amq="http://activemq.apache.org/schema/core"
+       xmlns:jms="http://www.springframework.org/schema/jms"
        xmlns:tx="http://www.springframework.org/schema/tx"
        xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
       http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-4.0.xsd
-      http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
+      http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+      http://www.springframework.org/schema/jms
+    http://www.springframework.org/schema/jms/spring-jms-4.0.xsd
+    http://activemq.apache.org/schema/core
+    http://activemq.apache.org/schema/core/activemq-core-5.8.0.xsd">
     <tx:annotation-driven transaction-manager="transactionManager"/>
     <context:property-placeholder location="classpath:jdbc.properties"/>
+    <context:component-scan base-package="com.lyh.activemq.producer"/>
+    <context:component-scan base-package="com.lyh.activemq.consumer"/>
     <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
         <property name="driverClassName">
             <value>${jdbc.driver}</value>
@@ -61,4 +69,7 @@
         <aop:pointcut expression="execution(* com.lyh.service.*.*(..))" id="serviceOperation"/>
         <aop:advisor advice-ref="txAdvice" pointcut-ref="serviceOperation"/>
     </aop:config>
+    <import resource="applicationContext-mq.xml"/>
+    <import resource="applicationContext-mq-consumer.xml"/>
+    <import resource="applicationContext-mail.xml"/>
 </beans>
